@@ -1,37 +1,36 @@
-# Qoruz AI Agents prototype
+# Qoruz AI
 
-A React and Vite prototype with five focused creator-marketing agents and three independent cloud model choices: Gemini, Ollama Cloud, and Groq. It uses the existing OpenUI chat shell and keeps conversation history per agent in browser local storage.
+A React and Vite chat prototype for creator discovery, campaign research and planning, content strategy, and influencer marketing questions. It uses OpenUI to render structured assistant responses and stores conversation threads in browser local storage.
 
 ## Local setup
 
 1. Use Node.js 22.23.3 (`nvm use`).
 2. Copy `.env.example` to `.env.local`.
-3. For Gemini, set `VITE_GEMINI_API_KEY` and, if needed, `VITE_GEMINI_MODEL` in `.env.local`. Vite embeds `VITE_` variables into browser code. This is only suitable for a restricted local prototype; never use a production Gemini key this way or commit `.env.local`.
-4. For Ollama Cloud, set `OLLAMA_API_KEY` in `.env.local` and choose a cloud model such as `gpt-oss:120b` in the model controls. The Vite dev and preview proxies attach the key on the server side; it is not exposed as a `VITE_` variable.
-5. For Groq, set `GROQ_API_KEY` in `.env.local`. The model selector loads active chat models from Groq.
-6. Run `npm run dev` and open the Vite URL, normally `http://localhost:5173`.
+3. Configure the providers you want to use:
+   - **Gemini:** set `VITE_GEMINI_API_KEY`. Optionally set `VITE_GEMINI_MODEL` (defaults to `gemini-3.6-flash`).
+   - **Ollama Cloud:** set `OLLAMA_API_KEY`. Optionally set `VITE_OLLAMA_MODEL` (defaults to `gpt-oss:120b`).
+   - **Groq:** set `GROQ_API_KEY`. Optionally set `VITE_GROQ_MODEL` (defaults to `openai/gpt-oss-120b`).
+   - **Qoruz campaigns:** set `VITE_QORUZ_API_KEY` to enable live campaign lookups. Optionally set `VITE_QORUZ_API_URL` (defaults to `https://api.qoruz.com/v1`).
+4. Optionally set `VITE_PROFILE_NAME` and `VITE_PROFILE_EMAIL` for the workspace profile.
+5. Run `npm run dev` and open the Vite URL, normally `http://localhost:5173`.
 
-Gemini uses the installed `@google/genai` browser SDK directly. Ollama Cloud and Groq use their OpenAI-compatible APIs through same-origin Vite proxies. Provider selection is independent of the selected agent and is saved locally. A provider is only considered usable after it returns a real request; configuration and network errors are shown in the chat.
+Choose the AI provider and model from the model controls. Available models are loaded from the selected provider, and provider/model preferences are saved in local storage. Ollama Cloud and Groq use same-origin Vite proxies at `/ollama` and `/groq`.
 
-## Agents and data
+## Qoruz data and limitations
 
-- **Influencer Discovery:** creator fit guidance and fictional creator cards for demonstrating the UI.
-- **Campaign Research:** performance analysis guidance and illustrative sample metrics/charts.
-- **Competitor Intelligence:** general competitor research frameworks, without claims of live findings.
-- **Campaign Planning:** campaign briefs and timelines. When a budget is supplied, JavaScript calculates an explicitly labeled recommendation split.
-- **Content Intelligence:** generated themes and formats, not claimed as published or trending content.
+The app can fetch campaigns from the configured Qoruz `/campaigns` endpoint when a prompt asks for the user's campaigns. Other creator discovery, research, planning, and content responses are AI-generated guidance; they are not live Qoruz data. The app does not use external web search or a database. Treat generated examples and recommendations as illustrative, and verify them before acting.
 
-This prototype does not call Qoruz APIs, use a database, or use external search. All sample records and metrics are labeled illustrative. Models must not present them as live Qoruz information. Conversation threads are stored in browser local storage on this device.
+## Security
 
-## Security boundary
+This is a local prototype, not a production deployment. `VITE_` variables are embedded in the browser bundle, so `VITE_GEMINI_API_KEY` and `VITE_QORUZ_API_KEY` are visible to users. Use restricted development credentials and rotate them if exposed. Never commit `.env.local`.
 
-The Gemini key is sent from the browser in this development prototype and is visible to anyone who can inspect the built client. Use a restricted, low-quota development key and rotate it if exposed. `OLLAMA_API_KEY` and `GROQ_API_KEY` stay on the Vite server during development. A production deployment needs a secured backend proxy for the cloud providers; the Vite proxy is not included in a static build.
+`OLLAMA_API_KEY` and `GROQ_API_KEY` are attached by the Vite server-side proxies during development and Vite preview. A static production build does not include these proxies; production hosting needs a secured backend proxy for these providers and for any secrets that must remain private.
 
-## Checks
+## Build and checks
 
-- `npm run lint`
-- `npm run build`
-# AI
-# AI
-=======
-# AI
+- `npm run dev` starts the development server.
+- `npm run lint` runs Oxlint.
+- `npm run build` creates the production site in `dist/`.
+- `npm run preview` serves the production build locally.
+
+The production build uses Rolldown code splitting for dependencies to keep JavaScript chunks below the configured 450 KiB target where possible. The generated `dist/` directory is build output and should not be committed.
