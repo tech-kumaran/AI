@@ -26,6 +26,21 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              {
+                name: 'vendor',
+                test: /node_modules[\\/]/,
+                maxSize: 450 * 1024,
+              },
+            ],
+          },
+        },
+      },
+    },
     server: { proxy: { '/ollama': ollamaCloudProxy, '/groq': groqCloudProxy } },
     preview: { proxy: { '/ollama': ollamaCloudProxy, '/groq': groqCloudProxy } },
   }
