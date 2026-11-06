@@ -34,3 +34,5 @@ This is a local prototype, not a production deployment. `VITE_` variables are em
 - `npm run preview` serves the production build locally.
 
 The production build uses Rolldown code splitting for dependencies to keep JavaScript chunks below the configured 450 KiB target where possible. The generated `dist/` directory is build output and should not be committed.
+
+Vercel is configured to install development dependencies during its build because Vite and the React plugin are required to compile the site. `vercel.json` uses `npm ci --include=dev` to ensure these tools are available even if the build environment sets `NODE_ENV=production`.
